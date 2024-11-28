@@ -58,6 +58,7 @@ private:
                 int e1index = TriTable[value][index + 1];
                 int e2index = TriTable[value][index + 2];
 
+                //体数据中实际点位置
                 Int16Triple e0p0 = cell.cubeImageIndices[Cube::EdgeIndexToEdgeVertexIndex[e0index][0]];
                 Int16Triple e0p1 = cell.cubeImageIndices[Cube::EdgeIndexToEdgeVertexIndex[e0index][1]];
 
@@ -67,15 +68,34 @@ private:
                 Int16Triple e2p0 = cell.cubeImageIndices[Cube::EdgeIndexToEdgeVertexIndex[e2index][0]];
                 Int16Triple e2p1 = cell.cubeImageIndices[Cube::EdgeIndexToEdgeVertexIndex[e2index][1]];
 
+                //两个点的边取中间点
                 Point3d e0pm = GetIntersetedPoint(e0p0, e0p1);
                 Point3d e1pm = GetIntersetedPoint(e1p0, e1p1);
-                Point3d e2pm = GetIntersetedPoint(e2p0, e2p1);
+				Point3d e2pm = GetIntersetedPoint(e2p0, e2p1);
 
-                builder.AddTriangle(e0pm, e1pm, e2pm);
+				builder.AddTriangle(e0pm, e1pm, e2pm);
 
-                index += 3;
-            }
+				index += 3;
+			}
+		}
+	}
+    Point3d ComputeGradient(const Int16Triple& pointIndex) const {
+        double value = bmp->GetPixel(pointIndex.x, pointIndex.y, pointIndex.z);
+
+        double dx = 0, dy = 0, dz = 0;
+        if (pointIndex.x + 1 < bmp->width) {
+            dx = bmp->GetPixel(pointIndex.x + 1, pointIndex.y, pointIndex.z) - value;
         }
+
+        if (pointIndex.y + 1 < bmp->height) {
+            dy = bmp->GetPixel(pointIndex.x, pointIndex.y + 1, pointIndex.z) - value;
+        }
+
+        if (pointIndex.z + 1 < bmp->depth) {
+            dz = bmp->GetPixel(pointIndex.x, pointIndex.y, pointIndex.z + 1) - value;
+        }
+
+        return Point3d(dx, dy, dz).Normalized();
     }
 
     Point3d GetIntersetedPoint(const Int16Triple& p0, const Int16Triple& p1) const {

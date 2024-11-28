@@ -5,7 +5,7 @@
 
 #include <vector>
 
-const float ZOOM = 45.0f;
+const float ZOOM = 75.0f;
 
 class Camera
 {
@@ -42,11 +42,11 @@ public:
 
 	void ProcessMouseScroll(float yoffset)
 	{
-		if (Zoom >= 1.0f && Zoom <= 45.0f)
+		if (Zoom >= 1.0f && Zoom <= 75.0f)
 			Zoom -= yoffset;
 		if (Zoom <= 1.0f)
 			Zoom = 1.0f;
-		if (Zoom >= 45.0f)
-			Zoom = 45.0f;
+		if (Zoom >= 75.0f)
+			Zoom = 75.0f;
 	}
 };

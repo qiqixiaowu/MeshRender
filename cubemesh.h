@@ -2,12 +2,9 @@
 #include <vector>
 
  
-struct Point3d {
-    Point3d(float x = 0, float y = 0, float z = 0){
-        this->x = x;
-        this->y = y;
-        this->z = z;
-    }
+class Point3d {
+public:
+    Point3d(double x = 0.0, double y = 0.0, double z = 0.0) : x(x), y(y), z(z) {}
  
     bool operator<(const Point3d& other) const {
         if (x != other.x) return x< other.x;
@@ -15,11 +12,37 @@ struct Point3d {
         return z < other.z;
     }
 
-    float x;
-    float y;
-    float z;
-};
+    Point3d operator-(const Point3d& other) const {
+        return Point3d(x - other.x, y - other.y, z - other.z);
+    }
 
+    Point3d operator+(const Point3d& other) const {
+        return Point3d(x + other.x, y + other.y, z + other.z);
+    }
+
+    Point3d Cross(const Point3d& other) const {
+        return Point3d(
+            y * other.z - z * other.y,
+            z * other.x - x * other.z,
+            x * other.y - y * other.x
+        );
+    }
+
+    Point3d Normalized() const {
+        double length = Length();
+        if (length == 0) {
+            return Point3d(0, 0, 0);
+        }
+        return Point3d(x / length, y / length, z / length);
+    }
+
+    double Length() const {
+        return sqrt(x * x + y * y + z * z);
+    }
+
+    float x, y, z;
+};
+ 
 struct Triangle {
     int P0Index;
     int P1Index;
@@ -32,6 +55,7 @@ struct Triangle {
 class CubeMesh {
 public:
     std::vector<Point3d> Vertices;
+    std::vector<Point3d> Normals;
     std::vector<Triangle> Faces;
  
     CubeMesh() {}
@@ -45,9 +69,15 @@ public:
         return Faces.size() - 1;  
     }
 
-    void Clear() {
-        Vertices.clear();
+	int AddNormal(const std::vector<Point3d>& vecPoint) {
+		Normals.insert(Normals.end(), vecPoint.begin(), vecPoint.end());
+		return Normals.size() - 1;
+	}
+
+	void Clear() {
+		Vertices.clear();
         Faces.clear();
+        Normals.clear();
     }
 };
  

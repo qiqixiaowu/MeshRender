@@ -20,9 +20,9 @@ void AWriteV(std::ofstream& os, double v1, double v2, double v3, unsigned char r
 }
 
 // 写入面信息
-void AWriteF(std::ofstream& os, int i1, int i2, int i3) {
+void AWriteF(std::ofstream& os, double i1, double i2, double i3) {
     std::stringstream ss;
-    ss << "3 " << i1 << " " << i2 << " " << i3 << "\n";
+    ss << i1 << " " << i2 << " " << i3 << "\n";
     os << ss.str();
 }
 

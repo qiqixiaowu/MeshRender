@@ -10,7 +10,9 @@ class NewModel
 public:
 	NewModel(CubeMesh cubeMesh);
 	void Draw(Shader* shader);
-	Mesh GetMesh();
+	std::shared_ptr<Mesh> GetMesh();
+private:
+	std::shared_ptr<Mesh> m_cachedMesh;
 
 private:
 	std::vector<CubeMesh> m_meshes;

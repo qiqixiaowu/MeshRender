@@ -46,9 +46,9 @@ float quadVertices[] =
 
 #pragma region Camera
 bool mouseBtnPressed = false;
-static Trackball trackball(320, 240, 2.0f);
+static Trackball trackball(640, 480, 2.0f);
 glm::mat4 modelMat = glm::mat4(1.0f);
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 80.0f);
+glm::vec3 cameraPos = glm::vec3(20.0f, 0.0f, 220.0f);
 glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, -10.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 5.0f, 0.0f);
 Camera camera(cameraPos, cameraTarget, cameraUp);
@@ -195,12 +195,13 @@ int main()
 		}
 	}
 
-
 	BitMap3d bmp(spDicomImage3D->m_iDimension[0], spDicomImage3D->m_iDimension[1], spDicomImage3D->m_iDimension[2], vecPixelValue);
 	auto spProcessor = std::make_shared<MCProcessor>(&bmp);
 
-	std::string filePath = "output2.ply";
-	//Output(spProcessor->GeneratorSurface(), filePath);
+	std::string filePath = "output.ply";
+	Output(spProcessor->GeneratorSurface(), filePath);
+
+	return 0;
 	auto cubeMesh = spProcessor->GeneratorSurface();
 
 #pragma region  
@@ -209,7 +210,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(400, 300, "Viewer", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(640, 480, "Viewer", NULL, NULL);
 	if (window == NULL)
 	{
 		printf("Open window failed.");
@@ -218,7 +219,7 @@ int main()
 	}
 	const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 	int screenHeight = mode->height;
-	glfwSetWindowPos(window, 0, screenHeight - 300);
+	glfwSetWindowPos(window, 0, 150);
 
 	glfwMakeContextCurrent(window);
  
@@ -256,9 +257,10 @@ int main()
 
 #pragma region Model
 	//std::string exePath = "E:\\Render\MeshRender\\output2.ply";
-	std::string exePath = "E:\\Render\\MeshRender\\model\\111115_lower.obj";
-	Model model(exePath);
-	 
+	//std::string exePath = "E:\\Render\\MeshRender\\model\\111115_lower.obj";
+	//Model model(exePath);
+	NewModel model(cubeMesh);
+
 	unsigned int quadVAO, quadVBO;
 	glGenVertexArrays(1, &quadVAO);
 	glGenBuffers(1, &quadVBO);

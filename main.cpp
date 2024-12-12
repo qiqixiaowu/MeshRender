@@ -25,7 +25,6 @@
 #include "dcmtk/dcmdata/dcelem.h"
 #include <dcmtk/dcmdata/dcfilefo.h>
 
-
 #include "mc_processor.h"
 #include "dicom_image3d.h"
 #include "export_ply.h"
@@ -48,13 +47,15 @@ float quadVertices[] =
 bool mouseBtnPressed = false;
 static Trackball trackball(640, 480, 2.0f);
 glm::mat4 modelMat = glm::mat4(1.0f);
-glm::vec3 cameraPos = glm::vec3(20.0f, 0.0f, 220.0f);
-glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, -10.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 5.0f, 0.0f);
+
+glm::vec3 cameraPos = glm::vec3(250, -300, 400);
+glm::vec3 cameraTarget = glm::vec3(250,250,80);
+glm::vec3 cameraUp = glm::vec3(0, -1, 0);  
+
 Camera camera(cameraPos, cameraTarget, cameraUp);
 #pragma endregion
 
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(2.0f, 1.60f, 2.0f);
 
 #pragma region Device
 float deltaTime = 0.0f;  
@@ -149,9 +150,9 @@ std::shared_ptr<UDicomImage3D> GenerateDicomImage3D(const std::vector<std::share
 int main() 
 {
 	std::filesystem::path current_path = std::filesystem::current_path();
-	std::string directoryPath = "E:\\Data\\BPTQ_PET_AD_2018_024_110859\\2.850 x 300_301";
+	std::string directoryPath = "E:\\Data\\BPTQ_PET_AD_2018_024_110859\\3.0 x 1.5_202";
 
-	OFList<OFString> fileList;
+	OFList<OFString> fileList; 
 	OFStandard::searchDirectoryRecursively(directoryPath.c_str(), fileList, "", "", true);
 	if (fileList.empty())
 	{
@@ -198,10 +199,10 @@ int main()
 	BitMap3d bmp(spDicomImage3D->m_iDimension[0], spDicomImage3D->m_iDimension[1], spDicomImage3D->m_iDimension[2], vecPixelValue);
 	auto spProcessor = std::make_shared<MCProcessor>(&bmp);
 
-	std::string filePath = "output.ply";
-	Output(spProcessor->GeneratorSurface(), filePath);
+	//std::string filePath = "output2.ply";
+	//Output(spProcessor->GeneratorSurface(), filePath);
 
-	return 0;
+	//return 0;
 	auto cubeMesh = spProcessor->GeneratorSurface();
 
 #pragma region  
@@ -246,7 +247,7 @@ int main()
 	unsigned int renderedTexture;
 	glGenTextures(1, &renderedTexture);
 	glBindTexture(GL_TEXTURE_2D, renderedTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 400, 300, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0);
@@ -256,9 +257,10 @@ int main()
 #pragma endregion
 
 #pragma region Model
-	//std::string exePath = "E:\\Render\MeshRender\\output2.ply";
+	//std::string exePath = "E:\\Render\MeshRender\\output.ply";
 	//std::string exePath = "E:\\Render\\MeshRender\\model\\111115_lower.obj";
 	//Model model(exePath);
+ 
 	NewModel model(cubeMesh);
 
 	unsigned int quadVAO, quadVBO;
@@ -306,10 +308,12 @@ int main()
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		//ÉèÖÃÍ¸ÊÓ¾ØÕó
-		projMat = glm::perspective(glm::radians(camera.Zoom), 640.0f / 480.0f, 0.1f, 100.0f);
+		projMat = glm::perspective(glm::radians(60.0f), 640.0f / 480.f, 1.0f, 1000.0f);
 		glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projMat));
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		auto MVP = projMat * viewMat * modelMat;
 
 		glEnable(GL_CULL_FACE);	
 		first->use();	 
@@ -326,7 +330,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		screenShader->use();
+ 
 		glBindVertexArray(quadVAO);
+	/*	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);*/
 		glDrawArrays(GL_TRIANGLES, 0, 6);
  
 		glfwSwapBuffers(window);

@@ -10,12 +10,13 @@ class MeshBuilder
 public:
     MeshBuilder() : mesh(), m_hashMap() {}
 
-	void AddTriangle(const Point3d& p0, const Point3d& p1, const Point3d& p2) {
+	void AddTriangle(const Point3d& p0, const Point3d& p1, const Point3d& p2, const std::array<Point3d, 3>& p3) {
 		int p0i, p1i, p2i;
 
 		auto it = m_hashMap.find(p0);
 		if (it == m_hashMap.end()) {
 			p0i = mesh.AddVertex(p0);
+            //mesh.AddNormal(p3[0]);
             m_hashMap[p0] = p0i;
         }
         else {
@@ -25,6 +26,7 @@ public:
         it = m_hashMap.find(p1);
         if (it == m_hashMap.end()) {
             p1i = mesh.AddVertex(p1);
+            //mesh.AddNormal(p3[1]);
             m_hashMap[p1] = p1i;
         }
         else {
@@ -34,19 +36,15 @@ public:
         it = m_hashMap.find(p2);
         if (it == m_hashMap.end()) {
             p2i = mesh.AddVertex(p2);
+            //mesh.AddNormal(p3[2]);
             m_hashMap[p2] = p2i;
         }
         else {
             p2i = it->second;
         }
 
-        std::vector<Point3d> vertices;
-        vertices.push_back(p0);
-        vertices.push_back(p1);
-        vertices.push_back(p2);
-        
-        mesh.AddNormal(ComputeVertexNormals(vertices));
         Triangle t = { p0i, p1i, p2i };
+
         mesh.AddFace(t);
     }
 
@@ -57,7 +55,6 @@ public:
             v1[0] * v2[1] - v1[1] * v2[0]
         };
     }
-
  
     std::vector<float> normalize(const std::vector<float>& v) {
         float length = std::sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);

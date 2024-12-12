@@ -27,7 +27,22 @@ public:
                 }
             }
         }
-        return builder.GetMesh();
+
+		auto mesh = builder.GetMesh();
+		auto vertices = mesh.Vertices;
+		for (const auto& tri : mesh.Faces)
+		{
+			Point3d p0 = vertices[tri.P0Index];
+			Point3d p1 = vertices[tri.P1Index];
+			Point3d p2 = vertices[tri.P2Index];
+
+            Point3d normal = (p1 - p0).Cross(p2 - p0).Normalized();
+            mesh.AddNormal(normal);
+            mesh.AddNormal(normal);
+            mesh.AddNormal(normal);
+		}
+
+        return mesh;
     }
 
 private:
@@ -73,13 +88,47 @@ private:
                 Point3d e1pm = GetIntersetedPoint(e1p0, e1p1);
 				Point3d e2pm = GetIntersetedPoint(e2p0, e2p1);
 
-				builder.AddTriangle(e0pm, e1pm, e2pm);
+                //处理法线
+                //Point3d normal1 = ComputeGradient(e0pm);
+                //Point3d normal2 = ComputeGradient(e1pm);
+                //Point3d normal3 = ComputeGradient(e2pm);
+                //std::array<Point3d, 3> arrNormals = { normal1, normal2, normal3 };
+
+                Point3d normal1= calTriNormal(e0pm, e0pm, e0pm);
+                std::array<Point3d, 3> arrNormals = { normal1, normal1, normal1 };
+				builder.AddTriangle(e0pm, e1pm, e2pm, arrNormals);
 
 				index += 3;
 			}
 		}
 	}
-    Point3d ComputeGradient(const Int16Triple& pointIndex) const {
+
+
+    Point3d calTriNormal(Point3d ver1, Point3d ver2, Point3d ver3) const
+    {
+        double temp1[3], temp2[3], normal[3];
+        double length = 0.0;
+        temp1[0] = ver2.x - ver1.x;
+        temp1[1] = ver2.y - ver1.y;
+        temp1[2] = ver2.z - ver1.z;
+        temp2[0] = ver3.x - ver2.x;
+        temp2[1] = ver3.y - ver2.y;
+        temp2[2] = ver3.z - ver2.z;
+        //计算法线
+        normal[0] = temp1[1] * temp2[2] - temp1[2] * temp2[1];
+        normal[1] = -(temp1[0] * temp2[2] - temp1[2] * temp2[0]);
+        normal[2] = temp1[0] * temp2[1] - temp1[1] * temp2[0];
+        //法线单位化
+        length = sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+        if (length == 0.0f) { length = 1.0f; }
+        normal[0] /= length;
+        normal[1] /= length;
+        normal[2] /= length;
+        Point3d e_normal(normal[0], normal[1], normal[2]);
+        return e_normal;
+    }
+
+    Point3d ComputeGradient(Point3d& pointIndex) const {
         double value = bmp->GetPixel(pointIndex.x, pointIndex.y, pointIndex.z);
 
         double dx = 0, dy = 0, dz = 0;

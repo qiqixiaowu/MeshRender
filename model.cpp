@@ -54,9 +54,9 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 		vector.z = mesh->mNormals[i].z;
 		vertex.Normal = vector;
 		//ÑÕÉ«
-		vector.x = 0.5;
-		vector.y = 0.6;
-		vector.z = 0.7;
+		vector.x = 0.490;
+		vector.y = 0.580;
+		vector.z = 0.980;
 		vertex.Color = vector;
 
 		vertices.push_back(vertex);

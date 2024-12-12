@@ -69,8 +69,8 @@ public:
         return Faces.size() - 1;  
     }
 
-	int AddNormal(const std::vector<Point3d>& vecPoint) {
-		Normals.insert(Normals.end(), vecPoint.begin(), vecPoint.end());
+	int AddNormal(const Point3d& point) {
+		Normals.push_back(point);
 		return Normals.size() - 1;
 	}
 
